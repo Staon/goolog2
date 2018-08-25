@@ -111,7 +111,7 @@ olog2.Critical1("No one has programmed this piece of SW!! I cannot work!")
 olog2.Info1("server stopped") 
 ```
 There is a set of convenient functions following simple name scheme:
-_<Severity><Verbosity>_. The names can end with _s_ or _f_ - those
+_SeverityVerbosity_. The names can end with _s_ or _f_ - those
 function allow specification of a subsystem or the message can be
 formatted by standard _printf_ format description:
 
