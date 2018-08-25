@@ -73,6 +73,28 @@ func AddFileLogger(
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
+// Add a pattern file logger
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+//     pattern: pattern of names the log files
+//     sync: flush all message immediately
+func AddPatternFileLogger(
+	name string,
+	subsystem string,
+	severities SeverityMask,
+	verbosity Verbosity,
+	pattern string,
+	sync bool,
+) {
+	f := NewPatternFile(timeSource, pattern, sync)
+	logger := NewFileLogger(timeSource, f)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
 // Log a logging object into the global log
 //
 // Parameters:

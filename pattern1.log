@@ -1,0 +1,4 @@
+testlog 2018-08-25T14:02:00 [    INFO, 1] (): First message
+testlog 2018-08-25T14:02:00 [   ERROR, 1] (): First error
+testlog 2018-08-25T14:02:30 [    INFO, 1] (): Second message
+testlog 2018-08-25T14:02:30 [   ERROR, 1] (): Second error
