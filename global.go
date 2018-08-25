@@ -1,6 +1,8 @@
 package goolog2
 
-import ()
+import (
+	"os"
+)
 
 var globalLog LogDispatcher
 var timeSource TimeSource
@@ -92,6 +94,42 @@ func AddPatternFileLogger(
 ) {
 	f := NewPatternFile(timeSource, pattern, sync)
 	logger := NewFileLogger(timeSource, f)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
+// Add a console logger
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+//     output: an output stream
+func AddConsoleLogger(
+	name string,
+	subsystem string,
+	severities SeverityMask,
+	verbosity Verbosity,
+	output *os.File,
+) {
+	logger := NewConsoleLogger(output)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
+// Add a console logger on the standard error
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+func AddConsoleLoggerStderr(
+	name string,
+	subsystem string,
+	severities SeverityMask,
+	verbosity Verbosity,
+) {
+	logger := NewConsoleLogger(os.Stderr)
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 

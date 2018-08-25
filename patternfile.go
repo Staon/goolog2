@@ -23,6 +23,23 @@ type patternFile struct {
 	rotateMutex sync.Mutex
 }
 
+// Create new pattern file holder
+//
+// This implementation allows rotating of log files according
+// specified pattern.
+//
+// The pattern is a string which can contain special sequences:
+//     %Y ..... year (4 digits)
+//     %m ..... month (01 - 12)
+//     %d ..... day (01 - 31)
+//     %H ..... hour (00 - 23)
+//     %M ..... minute (00 - 59)
+//     %% ..... %
+//
+// Parameters:
+//     timesrc: time source
+//     pattern: the filename pattern
+//     sync: flush the file after every line
 func NewPatternFile(
 	timesrc TimeSource,
 	pattern string,
