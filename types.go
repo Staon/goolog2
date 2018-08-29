@@ -2,6 +2,9 @@ package goolog2
 
 import ()
 
+// Subsystem name
+type Subsystem string
+
 // Severity of a log message
 type Severity uint32
 

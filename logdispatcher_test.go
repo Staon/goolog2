@@ -15,7 +15,7 @@ func (this *testLogger) Destroy() {
 
 func (this *testLogger) LogObject(
 	system string,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},

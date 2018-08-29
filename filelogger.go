@@ -33,7 +33,7 @@ func (this *fileLogger) Destroy() {
 
 func (this *fileLogger) LogObject(
 	system string,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},

@@ -19,7 +19,7 @@ type Logger interface {
 	//     object: an object to be logged
 	LogObject(
 		system string,
-		subsystem string,
+		subsystem Subsystem,
 		severity Severity,
 		verbosity Verbosity,
 		object interface{})

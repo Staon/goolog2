@@ -21,7 +21,7 @@ type LogDispatcher interface {
 	//     verbosity: verbosity of the log message
 	//     object: an object to be logged
 	LogObject(
-		subsystem string,
+		subsystem Subsystem,
 		severity Severity,
 		verbosity Verbosity,
 		object interface{})
@@ -36,14 +36,14 @@ type LogDispatcher interface {
 	//     logger: the logger object
 	AddLogger(
 		name string,
-		subsystem string,
+		subsystem Subsystem,
 		severities SeverityMask,
 		verbosity Verbosity,
 		logger Logger)
 }
 
 type logDispatcherRecord struct {
-	subsystem  string
+	subsystem  Subsystem
 	severities SeverityMask
 	verbosity  Verbosity
 	logger     Logger
@@ -75,7 +75,7 @@ func (this *logDispatcher) Destroy() {
 }
 
 func (this *logDispatcher) LogObject(
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},
@@ -96,7 +96,7 @@ func (this *logDispatcher) LogObject(
 
 func (this *logDispatcher) AddLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	logger Logger,
@@ -114,7 +114,7 @@ func (this *logDispatcher) AddLogger(
 // Log a logging object
 func DispatcherLogObject(
 	log LogDispatcher,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},
@@ -133,7 +133,7 @@ func (this *simpleLogMessageObject) GetLogLine() string {
 // Log a text message
 func DispatcherLogMessage(
 	log LogDispatcher,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	message string,
@@ -157,7 +157,7 @@ func (this *formattedLogMessageObject) GetLogLine() string {
 // Log a formatted text message
 func DispatcherLogMessagef(
 	log LogDispatcher,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	format string,

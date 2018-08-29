@@ -32,7 +32,7 @@ func (this *apacheLogger) Destroy() {
 
 func (this *apacheLogger) LogObject(
 	system string,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},

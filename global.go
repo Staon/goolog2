@@ -45,7 +45,7 @@ func Destroy() {
 //             is destroyed with the dispatcher.
 func AddLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	logger Logger,
@@ -64,7 +64,7 @@ func AddLogger(
 //     sync: flush all message immediately
 func AddFileLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	file string,
@@ -86,7 +86,7 @@ func AddFileLogger(
 //     sync: flush all message immediately
 func AddPatternFileLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	pattern string,
@@ -107,7 +107,7 @@ func AddPatternFileLogger(
 //     output: an output stream
 func AddConsoleLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	output *os.File,
@@ -125,7 +125,7 @@ func AddConsoleLogger(
 //     verbosity: logging verbosity
 func AddConsoleLoggerStderr(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 ) {
@@ -144,7 +144,7 @@ func AddConsoleLoggerStderr(
 //     sync: flush all message immediately
 func AddApacheLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	file string,
@@ -166,7 +166,7 @@ func AddApacheLogger(
 //     sync: flush all message immediately
 func AddPatternApacheLogger(
 	name string,
-	subsystem string,
+	subsystem Subsystem,
 	severities SeverityMask,
 	verbosity Verbosity,
 	pattern string,
@@ -185,7 +185,7 @@ func AddPatternApacheLogger(
 //     verbosity: logging verbosity
 //     object: logging object
 func LogObject(
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},
@@ -201,7 +201,7 @@ func LogObject(
 //     verbosity: logging verbosity
 //     message: the message
 func LogMessage(
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	message string,
@@ -218,7 +218,7 @@ func LogMessage(
 //     format: printf-like format of the message
 //     args: arguments of the message
 func LogMessagef(
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	format string,
@@ -243,7 +243,7 @@ func Critical1(
 }
 
 func Critical1s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Critical, 1, message)
@@ -257,7 +257,7 @@ func Critical1f(
 }
 
 func Critical1fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -272,7 +272,7 @@ func Error1(
 }
 
 func Error1s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Error, 1, message)
@@ -286,7 +286,7 @@ func Error1f(
 }
 
 func Error1fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -300,7 +300,7 @@ func Error2(
 }
 
 func Error2s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Error, 2, message)
@@ -314,7 +314,7 @@ func Error2f(
 }
 
 func Error2fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -328,7 +328,7 @@ func Error3(
 }
 
 func Error3s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Error, 3, message)
@@ -342,7 +342,7 @@ func Error3f(
 }
 
 func Error3fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -356,7 +356,7 @@ func Error4(
 }
 
 func Error4s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Error, 4, message)
@@ -370,7 +370,7 @@ func Error4f(
 }
 
 func Error4fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -386,7 +386,7 @@ func Warning1(
 }
 
 func Warning1s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Warning, 1, message)
@@ -400,7 +400,7 @@ func Warning1f(
 }
 
 func Warning1fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -414,7 +414,7 @@ func Warning2(
 }
 
 func Warning2s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Warning, 2, message)
@@ -428,7 +428,7 @@ func Warning2f(
 }
 
 func Warning2fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -442,7 +442,7 @@ func Warning3(
 }
 
 func Warning3s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Warning, 3, message)
@@ -456,7 +456,7 @@ func Warning3f(
 }
 
 func Warning3fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -470,7 +470,7 @@ func Warning4(
 }
 
 func Warning4s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Warning, 4, message)
@@ -484,7 +484,7 @@ func Warning4f(
 }
 
 func Warning4fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -499,7 +499,7 @@ func Info1(
 }
 
 func Info1s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Info, 1, message)
@@ -513,7 +513,7 @@ func Info1f(
 }
 
 func Info1fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -527,7 +527,7 @@ func Info2(
 }
 
 func Info2s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Info, 2, message)
@@ -541,7 +541,7 @@ func Info2f(
 }
 
 func Info2fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -555,7 +555,7 @@ func Info3(
 }
 
 func Info3s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Info, 3, message)
@@ -569,7 +569,7 @@ func Info3f(
 }
 
 func Info3fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -583,7 +583,7 @@ func Info4(
 }
 
 func Info4s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Info, 4, message)
@@ -597,7 +597,7 @@ func Info4f(
 }
 
 func Info4fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -611,7 +611,7 @@ func Info5(
 }
 
 func Info5s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Info, 5, message)
@@ -625,7 +625,7 @@ func Info5f(
 }
 
 func Info5fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -641,7 +641,7 @@ func Debug3(
 }
 
 func Debug3s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Debug, 3, message)
@@ -655,7 +655,7 @@ func Debug3f(
 }
 
 func Debug3fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -669,7 +669,7 @@ func Debug4(
 }
 
 func Debug4s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Debug, 4, message)
@@ -683,7 +683,7 @@ func Debug4f(
 }
 
 func Debug4fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {
@@ -697,7 +697,7 @@ func Debug5(
 }
 
 func Debug5s(
-	subsystem string,
+	subsystem Subsystem,
 	message string,
 ) {
 	DispatcherLogMessage(globalLog, subsystem, Debug, 5, message)
@@ -711,7 +711,7 @@ func Debug5f(
 }
 
 func Debug5fs(
-	subsystem string,
+	subsystem Subsystem,
 	format string,
 	args ...interface{},
 ) {

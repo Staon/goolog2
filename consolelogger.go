@@ -44,7 +44,7 @@ func (this *consoleLogger) Destroy() {
 
 func (this *consoleLogger) LogObject(
 	system string,
-	subsystem string,
+	subsystem Subsystem,
 	severity Severity,
 	verbosity Verbosity,
 	object interface{},
