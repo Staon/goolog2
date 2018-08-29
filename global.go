@@ -133,6 +133,50 @@ func AddConsoleLoggerStderr(
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
+// Add a Apache logger
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+//     file: path to the logging file
+//     sync: flush all message immediately
+func AddApacheLogger(
+	name string,
+	subsystem string,
+	severities SeverityMask,
+	verbosity Verbosity,
+	file string,
+	sync bool,
+) {
+	f := NewSimpleFile(file, sync)
+	logger := NewApacheLogger(f)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
+// Add a Apache logger
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+//     pattern: pattern of names the log files
+//     sync: flush all message immediately
+func AddPatternApacheLogger(
+	name string,
+	subsystem string,
+	severities SeverityMask,
+	verbosity Verbosity,
+	pattern string,
+	sync bool,
+) {
+	f := NewPatternFile(timeSource, pattern, sync)
+	logger := NewApacheLogger(f)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
 // Log a logging object into the global log
 //
 // Parameters:
@@ -149,6 +193,13 @@ func LogObject(
 	DispatcherLogObject(globalLog, subsystem, severity, verbosity, object)
 }
 
+// Log a text message
+//
+// Parameters:
+//     subsystem: logging subsystem
+//     severity: logging severity
+//     verbosity: logging verbosity
+//     message: the message
 func LogMessage(
 	subsystem string,
 	severity Severity,
@@ -158,6 +209,14 @@ func LogMessage(
 	DispatcherLogMessage(globalLog, subsystem, severity, verbosity, message)
 }
 
+// Log a formatted text message
+//
+// Parameters:
+//     subsystem: logging subsystem
+//     severity: logging severity
+//     verbosity: logging verbosity
+//     format: printf-like format of the message
+//     args: arguments of the message
 func LogMessagef(
 	subsystem string,
 	severity Severity,

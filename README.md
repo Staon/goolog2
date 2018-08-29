@@ -123,8 +123,8 @@ sometimes there is a need to specify severity and verbosity
 dynamically. Then the functions _LogMessage()_ and _LogMessagef()_
 can be useful.
 
-At the end of the process the framework should be correctly cleaned. 
-Hence the openede logging files can be correctly flushed and closed.
+At the end of the process the framework should be cleaned correctly
+flushing and closing opened files. 
 
 ```go
 olog2.Destroy()
