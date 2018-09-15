@@ -2,7 +2,6 @@ package goolog2
 
 import (
 	"fmt"
-	"io"
 )
 
 type apacheLogger struct {
@@ -63,7 +62,7 @@ func (this *apacheLogger) LogObject(
 	}
 
 	/* -- write the message */
-	this.file.AccessWriter(func(writer io.Writer) {
+	this.file.AccessWriter(func(writer FileWriter) {
 		fmt.Fprintf(
 			writer,
 			"%s %s %s [%s] \"%s %s %s\" %03d %d \"%s\" \"%s\"\n",

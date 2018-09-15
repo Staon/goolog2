@@ -1,13 +1,11 @@
 package goolog2
 
-import (
-	"fmt"
-	"io"
-)
+import ()
 
 type fileLogger struct {
-	timesrc TimeSource
-	file    FileHolder
+	timesrc   TimeSource
+	file      FileHolder
+	formatter LineFormatter
 }
 
 // Create new file logger
@@ -15,15 +13,18 @@ type fileLogger struct {
 // Parameters:
 //     timesrc: a timesource
 //     file: a file holder used for the output
+//     formatter: a line formatter
 // Returns:
 //     the logger
 func NewFileLogger(
 	timesrc TimeSource,
 	file FileHolder,
+	formatter LineFormatter,
 ) Logger {
 	return &fileLogger{
-		timesrc: timesrc,
-		file:    file,
+		timesrc:   timesrc,
+		file:      file,
+		formatter: formatter,
 	}
 }
 
@@ -45,15 +46,14 @@ func (this *fileLogger) LogObject(
 	}
 
 	/* -- write the message */
-	this.file.AccessWriter(func(writer io.Writer) {
-		fmt.Fprintf(
+	this.file.AccessWriter(func(writer FileWriter) {
+		this.formatter.FormatLine(
 			writer,
-			"%s %s [%8s, %d] (%s): %s\n",
+			this.timesrc.Now(),
 			system,
-			this.timesrc.Now().Format("2006-01-02T15:04:05"),
-			severity.Code(),
-			verbosity,
 			subsystem,
+			severity,
+			verbosity,
 			line.GetLogLine())
 	})
 }

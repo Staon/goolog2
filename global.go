@@ -70,8 +70,10 @@ func AddFileLogger(
 	file string,
 	sync bool,
 ) {
-	f := NewSimpleFile(file, sync)
-	logger := NewFileLogger(timeSource, f)
+	logger := NewFileLogger(
+		timeSource,
+		NewSimpleFile(file, sync),
+		NewLineFormatterDefault(false))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -92,8 +94,10 @@ func AddPatternFileLogger(
 	pattern string,
 	sync bool,
 ) {
-	f := NewPatternFile(timeSource, pattern, sync)
-	logger := NewFileLogger(timeSource, f)
+	logger := NewFileLogger(
+		timeSource,
+		NewPatternFile(timeSource, pattern, sync),
+		NewLineFormatterDefault(false))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -112,7 +116,10 @@ func AddConsoleLogger(
 	verbosity Verbosity,
 	output *os.File,
 ) {
-	logger := NewConsoleLogger(output)
+	logger := NewFileLogger(
+		timeSource,
+		NewSimpleFileHandle(output, false),
+		NewLineFormatterDefault(true))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -129,7 +136,10 @@ func AddConsoleLoggerStderr(
 	severities SeverityMask,
 	verbosity Verbosity,
 ) {
-	logger := NewConsoleLogger(os.Stderr)
+	logger := NewFileLogger(
+		timeSource,
+		NewSimpleFileHandle(os.Stderr, false),
+		NewLineFormatterDefault(true))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 

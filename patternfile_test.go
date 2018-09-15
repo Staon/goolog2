@@ -20,9 +20,8 @@ func TestPatternFile(t *testing.T) {
 	InitWithTimeSource("testlog", timesrc)
 
 	/* -- create the logger */
-	f := NewPatternFile(timesrc, "pattern%Y-%m-%d-%H:%M.log", false)
-	logger := NewFileLogger(timesrc, f)
-	AddLogger("file", "", MaskAll, 5, logger)
+	AddPatternFileLogger(
+		"file", "", MaskAll, 5, "pattern%Y-%m-%d-%H:%M.log", false)
 
 	Info1("First message")
 	Error1("First error")

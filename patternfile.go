@@ -2,7 +2,6 @@ package goolog2
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"sync"
@@ -19,6 +18,7 @@ type patternFile struct {
 	nextCheck   int64
 	currName    string
 	currFile    *os.File
+	currWriter  FileWriter
 	lineMutex   sync.Mutex
 	rotateMutex sync.Mutex
 }
@@ -53,7 +53,7 @@ func NewPatternFile(
 }
 
 func (this *patternFile) AccessWriter(
-	functor func(writer io.Writer),
+	functor func(writer FileWriter),
 ) {
 	/* -- check whether new filename should be tried */
 	now := this.timesrc.Now()
@@ -67,7 +67,7 @@ func (this *patternFile) AccessWriter(
 	this.lineMutex.Lock()
 	defer this.lineMutex.Unlock()
 	if this.currFile != nil {
-		functor(this.currFile)
+		functor(this.currWriter)
 		if this.sync {
 			this.currFile.Sync()
 		}
@@ -112,6 +112,7 @@ func (this *patternFile) checkNewFile(
 			this.lineMutex.Lock()
 			oldFile := this.currFile
 			this.currFile = newFile
+			this.currWriter = newSimpleFileWriter(newFile)
 			this.lineMutex.Unlock()
 
 			/* -- close the old file */
