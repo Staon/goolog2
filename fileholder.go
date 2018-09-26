@@ -41,6 +41,17 @@ type FileHolder interface {
 	AccessWriter(
 		functor func(writer FileWriter))
 
-	// Close the file holder
-	Close()
+	// Increase reference counter - there is new owner of the holder
+	//
+	// Returns: itself
+	Ref() FileHolder
+
+	// Decrease reference counter
+	//
+	// If the counter reaches zero the object is destroyed (files
+	// closed etc.)
+	//
+	// Expectation: there are no other threads accessing the holder
+	//     if the reference counter reaches zero!
+	Unref()
 }

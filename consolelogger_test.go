@@ -1,6 +1,7 @@
-package goolog2
+package goolog2_test
 
 import (
+	. "goolog2"
 	"testing"
 )
 

@@ -23,13 +23,13 @@ func NewFileLogger(
 ) Logger {
 	return &fileLogger{
 		timesrc:   timesrc,
-		file:      file,
+		file:      file.Ref(),
 		formatter: formatter,
 	}
 }
 
 func (this *fileLogger) Destroy() {
-	this.file.Close()
+	this.file.Unref()
 }
 
 func (this *fileLogger) LogObject(

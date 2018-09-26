@@ -1,7 +1,8 @@
-package goolog2
+package goolog2_test
 
 import (
 	"bytes"
+	. "goolog2"
 	"io/ioutil"
 	"os"
 	"testing"

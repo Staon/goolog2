@@ -70,10 +70,9 @@ func AddFileLogger(
 	file string,
 	sync bool,
 ) {
-	logger := NewFileLogger(
-		timeSource,
-		NewSimpleFile(file, sync),
-		NewLineFormatterDefault(false))
+	f := NewSimpleFile(file, sync)
+	defer f.Unref()
+	logger := NewFileLogger(timeSource, f, NewLineFormatterDefault(false))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -94,10 +93,9 @@ func AddPatternFileLogger(
 	pattern string,
 	sync bool,
 ) {
-	logger := NewFileLogger(
-		timeSource,
-		NewPatternFile(timeSource, pattern, sync),
-		NewLineFormatterDefault(false))
+	f := NewPatternFile(timeSource, pattern, sync)
+	defer f.Unref()
+	logger := NewFileLogger(timeSource, f, NewLineFormatterDefault(false))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -116,10 +114,9 @@ func AddConsoleLogger(
 	verbosity Verbosity,
 	output *os.File,
 ) {
-	logger := NewFileLogger(
-		timeSource,
-		NewSimpleFileHandle(output, false),
-		NewLineFormatterDefault(true))
+	f := NewSimpleFileHandle(output, false)
+	defer f.Unref()
+	logger := NewFileLogger(timeSource, f, NewLineFormatterDefault(true))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -136,10 +133,9 @@ func AddConsoleLoggerStderr(
 	severities SeverityMask,
 	verbosity Verbosity,
 ) {
-	logger := NewFileLogger(
-		timeSource,
-		NewSimpleFileHandle(os.Stderr, false),
-		NewLineFormatterDefault(true))
+	f := NewSimpleFileHandle(os.Stderr, false)
+	defer f.Unref()
+	logger := NewFileLogger(timeSource, f, NewLineFormatterDefault(true))
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -161,6 +157,7 @@ func AddApacheLogger(
 	sync bool,
 ) {
 	f := NewSimpleFile(file, sync)
+	defer f.Unref()
 	logger := NewApacheLogger(f)
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
@@ -183,6 +180,7 @@ func AddPatternApacheLogger(
 	sync bool,
 ) {
 	f := NewPatternFile(timeSource, pattern, sync)
+	defer f.Unref()
 	logger := NewApacheLogger(f)
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }

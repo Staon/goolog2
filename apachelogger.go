@@ -21,12 +21,12 @@ func NewApacheLogger(
 	file FileHolder,
 ) Logger {
 	return &apacheLogger{
-		file: file,
+		file: file.Ref(),
 	}
 }
 
 func (this *apacheLogger) Destroy() {
-	this.file.Close()
+	this.file.Unref()
 }
 
 func (this *apacheLogger) LogObject(

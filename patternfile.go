@@ -21,6 +21,7 @@ type patternFile struct {
 	currWriter  FileWriter
 	lineMutex   sync.Mutex
 	rotateMutex sync.Mutex
+	refcount    int32
 }
 
 // Create new pattern file holder
@@ -40,15 +41,20 @@ type patternFile struct {
 //     timesrc: time source
 //     pattern: the filename pattern
 //     sync: flush the file after every line
+// Returns:
+//     the new file holder
+// Note: the reference counter is set to 1. You have to invoke Unref()
+//     to clean up the holder.
 func NewPatternFile(
 	timesrc TimeSource,
 	pattern string,
 	sync bool,
 ) FileHolder {
 	return &patternFile{
-		timesrc: timesrc,
-		pattern: pattern,
-		sync:    sync,
+		timesrc:  timesrc,
+		pattern:  pattern,
+		sync:     sync,
+		refcount: 1,
 	}
 }
 
@@ -74,8 +80,20 @@ func (this *patternFile) AccessWriter(
 	}
 }
 
-func (this *patternFile) Close() {
+func (this *patternFile) Ref() FileHolder {
+	atomic.AddInt32(&this.refcount, 1)
+	return this
+}
 
+func (this *patternFile) Unref() {
+	refcount := atomic.AddInt32(&this.refcount, -1)
+	if refcount == 0 {
+		if this.currFile != nil {
+			this.currFile.Close()
+		}
+		this.currFile = nil
+		this.currWriter = nil
+	}
 }
 
 func (this *patternFile) checkNewFile(
