@@ -7,8 +7,6 @@ import (
 )
 
 type simpleFile struct {
-	owner    bool
-	file     *os.File
 	writer   FileWriter
 	mutex    sync.Mutex
 	sync     bool
@@ -29,7 +27,6 @@ func NewSimpleFile(
 	sync bool,
 ) FileHolder {
 	holder := &simpleFile{
-		owner:    true,
 		sync:     sync,
 		refcount: 1,
 	}
@@ -37,9 +34,9 @@ func NewSimpleFile(
 	// I ignore the error here - if the file cannot be opened, the logging
 	// just simply doesn't work. However, if I cannot open the logging
 	// file, I cannot report the error.
-	holder.file, _ = os.OpenFile(
+	file, _ := os.OpenFile(
 		filepath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-	holder.writer = newSimpleFileWriter(holder.file)
+	holder.writer = newSimpleFileWriter(file, true)
 
 	return holder
 }
@@ -58,9 +55,7 @@ func NewSimpleFileHandle(
 	sync bool,
 ) FileHolder {
 	return &simpleFile{
-		owner:    false,
-		file:     file,
-		writer:   newSimpleFileWriter(file),
+		writer:   newSimpleFileWriter(file, false),
 		sync:     sync,
 		refcount: 1,
 	}
@@ -87,11 +82,8 @@ func (this *simpleFile) Ref() FileHolder {
 
 func (this *simpleFile) Unref() {
 	refcount := atomic.AddInt32(&this.refcount, -1)
-	if refcount == 0 {
-		if this.writer != nil && this.owner {
-			this.file.Close()
-			this.file = nil
-			this.writer = nil
-		}
+	if refcount == 0 && this.writer != nil {
+		this.writer.Close()
+		this.writer = nil
 	}
 }

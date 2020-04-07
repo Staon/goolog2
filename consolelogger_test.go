@@ -1,8 +1,9 @@
 package goolog2_test
 
 import (
-	. "goolog2"
 	"testing"
+
+	. "github.com/Staon/goolog2"
 )
 
 func TestConsoleLogger(t *testing.T) {
