@@ -2,6 +2,7 @@ package goolog2
 
 import (
 	"io"
+	"os"
 )
 
 // Color constants
@@ -19,7 +20,11 @@ const (
 // This interface is a classic io.Writer interface extended
 // by possibility to change colors of the output.
 type FileWriter interface {
-	io.Writer
+	// If writter is not closable, the method Close returns nil.
+	io.WriteCloser
+
+	// If it is unable to read file info, it returns nil
+	Stat() os.FileInfo
 
 	// Flush the output
 	Sync()

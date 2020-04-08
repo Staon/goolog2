@@ -1,9 +1,10 @@
 package goolog2_test
 
 import (
-	. "goolog2"
 	"runtime"
 	"testing"
+
+	. "github.com/Staon/goolog2"
 )
 
 type testLogger struct {

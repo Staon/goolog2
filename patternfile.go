@@ -12,16 +12,12 @@ import (
 const checkInterval int64 = 30
 
 type patternFile struct {
-	timesrc     TimeSource
-	pattern     string
-	sync        bool
-	nextCheck   int64
-	currName    string
-	currFile    *os.File
-	currWriter  FileWriter
-	lineMutex   sync.Mutex
-	rotateMutex sync.Mutex
-	refcount    int32
+	pattern    string
+	sync       bool
+	currName   string
+	currWriter FileWriter
+	lineMutex  sync.Mutex
+	refcount   int32
 }
 
 // Create new pattern file holder
@@ -49,33 +45,26 @@ func NewPatternFile(
 	timesrc TimeSource,
 	pattern string,
 	sync bool,
-) FileHolder {
-	return &patternFile{
-		timesrc:  timesrc,
+) RotatableFileHolder {
+	holder := patternFile{
 		pattern:  pattern,
 		sync:     sync,
 		refcount: 1,
 	}
+	holder.Rotate(timesrc)
+	return &holder
 }
 
 func (this *patternFile) AccessWriter(
 	functor func(writer FileWriter),
 ) {
-	/* -- check whether new filename should be tried */
-	now := this.timesrc.Now()
-	checkTime := atomic.LoadInt64(&this.nextCheck)
-	if now.Unix() >= checkTime {
-		/* -- try to generate new filename */
-		this.checkNewFile(now)
-	}
-
 	/* -- log the line */
 	this.lineMutex.Lock()
 	defer this.lineMutex.Unlock()
-	if this.currFile != nil {
+	if this.currWriter != nil {
 		functor(this.currWriter)
 		if this.sync {
-			this.currFile.Sync()
+			this.currWriter.Sync()
 		}
 	}
 }
@@ -87,56 +76,49 @@ func (this *patternFile) Ref() FileHolder {
 
 func (this *patternFile) Unref() {
 	refcount := atomic.AddInt32(&this.refcount, -1)
-	if refcount == 0 {
-		if this.currFile != nil {
-			this.currFile.Close()
-		}
-		this.currFile = nil
+	if refcount == 0 && this.currWriter != nil {
+		this.currWriter.Close()
 		this.currWriter = nil
 	}
 }
 
-func (this *patternFile) checkNewFile(
-	now time.Time,
+// See LogRotator interface
+func (this *patternFile) NeedRotate(
+	timesrc TimeSource,
+) bool {
+	return true
+}
+
+// See LogRotator interface
+func (this *patternFile) Rotate(
+	timesrc TimeSource,
 ) {
-	/* -- synchronize threads which try to rotate the log file */
-	this.rotateMutex.Lock()
-	defer this.rotateMutex.Unlock()
+	/* -- generate new filename */
+	newName := this.generateFilename(timesrc.Now())
 
-	/* -- another thread could already rotate the file */
-	if now.Unix() >= this.nextCheck {
-		/* -- compute and set time of next check */
-		nextCheck := now.Unix() + checkInterval
-		atomic.StoreInt64(&this.nextCheck, nextCheck)
+	/* -- if the filename differs switch the files */
+	if newName != this.currName {
 
-		/* -- generate new filename */
-		newName := this.generateFilename(now)
+		/* -- No one other reads this value. So I can store it
+		without any synchronization */
+		this.currName = newName
 
-		/* -- if the filename differs switch the files */
-		if newName != this.currName {
+		/* -- open the new file */
+		newFile, err := os.OpenFile(
+			newName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+		if err != nil {
+			newFile = nil
+		}
 
-			/* -- No one other reads this value. So I can store it
-			without any synchronization */
-			this.currName = newName
+		/* -- switch the file */
+		this.lineMutex.Lock()
+		oldWriter := this.currWriter
+		this.currWriter = newSimpleFileWriter(newFile, true)
+		this.lineMutex.Unlock()
 
-			/* -- open the new file */
-			newFile, err := os.OpenFile(
-				newName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
-			if err != nil {
-				newFile = nil
-			}
-
-			/* -- switch the file */
-			this.lineMutex.Lock()
-			oldFile := this.currFile
-			this.currFile = newFile
-			this.currWriter = newSimpleFileWriter(newFile)
-			this.lineMutex.Unlock()
-
-			/* -- close the old file */
-			if oldFile != nil {
-				oldFile.Close()
-			}
+		/* -- close the old file */
+		if oldWriter != nil {
+			oldWriter.Close()
 		}
 	}
 }
@@ -182,4 +164,14 @@ func (this *patternFile) generateFilename(
 	}
 
 	return builder.String()
+}
+
+// See LogRotator interface
+func (this *patternFile) GetNextCheckTime(
+	timesrc TimeSource,
+) time.Time {
+	/* -- compute and set time of next check */
+	now := timesrc.Now()
+	nextCheck := now.Add(time.Duration(checkInterval) * time.Second)
+	return nextCheck
 }

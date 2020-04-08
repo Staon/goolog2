@@ -2,11 +2,12 @@ package goolog2_test
 
 import (
 	"bytes"
-	. "goolog2"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	. "github.com/Staon/goolog2"
 )
 
 type mockApacheObject struct {

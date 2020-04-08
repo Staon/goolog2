@@ -2,10 +2,12 @@ package goolog2
 
 import (
 	"os"
+	"time"
 )
 
 var globalLog LogDispatcher
 var timeSource TimeSource
+var globalRotator logsRotatorStarter
 
 // Initialize the global log
 //
@@ -14,8 +16,7 @@ var timeSource TimeSource
 func Init(
 	system string,
 ) {
-	timeSource = NewTimeSourceLocal()
-	globalLog = NewLogDispatcher(system)
+	InitWithTimeSource(system, NewTimeSourceLocal())
 }
 
 // Initialize the global log with specified time source
@@ -23,8 +24,20 @@ func InitWithTimeSource(
 	system string,
 	timesrc TimeSource,
 ) {
+	if globalLog != nil {
+		globalLog.Destroy()
+	}
 	timeSource = timesrc
 	globalLog = NewLogDispatcher(system)
+	globalRotator = newRotators(timeSource)
+}
+
+// If mocked time source is used (see InitWithTimeSource), this method must be called after every time shift.
+//
+// Parameters:
+//     waitToRotators - true => Wait to finish corresponding rotators actions (scheduled for this time or earlier).
+func AfterChangeMockedTime(waitToRotators bool) {
+	globalRotator.OnMockedTimeChanged(waitToRotators)
 }
 
 // Destroy the global log
@@ -53,6 +66,18 @@ func AddLogger(
 	globalLog.AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
+// Add a rotator. The rotator is usually connected to one particular logger.
+// See interface LogRotator. Methods NeedRotate + Rotate are runed in separate goroutine.
+// The start time of boths method is determined by the method GetNextCheckTime.
+//
+// Parameters:
+//     rotator
+func AddLogRotator(
+	rotator LogRotator,
+) {
+	globalRotator.Add(rotator)
+}
+
 // Add a simple file logger
 //
 // Parameters:
@@ -76,6 +101,34 @@ func AddFileLogger(
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
+// Add a rotatable file logger (It rotate file.log => file.log.1 => file.log.2 => ...)
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+//     file: path to the logging file
+//     sync: flush all message immediately
+//     maxSize:  Make log rotation if log size is bigger than maxSize.
+//     checkInterval: time interval to check the log size; usually minutes or tens of minutes
+func AddRotatableFileLogger(
+	name string,
+	subsystem Subsystem,
+	severities SeverityMask,
+	verbosity Verbosity,
+	file string,
+	sync bool,
+	maxSize int64,
+	checkInterval time.Duration,
+) {
+	f := NewRotatableFile(file, sync, maxSize, checkInterval)
+	defer f.Unref()
+	logger := NewFileLogger(timeSource, f, NewLineFormatterDefault(false))
+	AddLogRotator(f)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
 // Add a pattern file logger
 //
 // Parameters:
@@ -96,6 +149,7 @@ func AddPatternFileLogger(
 	f := NewPatternFile(timeSource, pattern, sync)
 	defer f.Unref()
 	logger := NewFileLogger(timeSource, f, NewLineFormatterDefault(false))
+	AddLogRotator(f)
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
@@ -162,6 +216,35 @@ func AddApacheLogger(
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 
+// Add a rotatable Apache logger (It rotate access.log => access.log.1 => access.log.2 => ...)
+//
+// Parameters:
+//     name: ID of the logger
+//     subsystem: logging subsystem. Can be empty.
+//     severities: mask of logging severities
+//     verbosity: logging verbosity
+//     file: path to the logging file
+//     sync: flush all message immediately
+//     maxSize:  Make log rotation if log size is bigger than maxSize.
+//     checkInterval: time interval to check the log size; usually minutes or tens of minutes
+func AddRotatableApacheLogger(
+	name string,
+	subsystem Subsystem,
+	severities SeverityMask,
+	verbosity Verbosity,
+	file string,
+	sync bool,
+	maxSize int64,
+	checkInterval time.Duration,
+) {
+	f := NewRotatableFile(file, sync, maxSize, checkInterval)
+	globalRotator.Add(f)
+	defer f.Unref()
+	logger := NewApacheLogger(f)
+	AddLogRotator(f)
+	AddLogger(name, subsystem, severities, verbosity, logger)
+}
+
 // Add a Apache logger
 //
 // Parameters:
@@ -182,6 +265,7 @@ func AddPatternApacheLogger(
 	f := NewPatternFile(timeSource, pattern, sync)
 	defer f.Unref()
 	logger := NewApacheLogger(f)
+	AddLogRotator(f)
 	AddLogger(name, subsystem, severities, verbosity, logger)
 }
 

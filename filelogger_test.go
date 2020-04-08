@@ -2,11 +2,12 @@ package goolog2_test
 
 import (
 	"bytes"
-	. "goolog2"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	. "github.com/Staon/goolog2"
 )
 
 type mockTimeSource struct {
@@ -14,6 +15,33 @@ type mockTimeSource struct {
 }
 
 func (this *mockTimeSource) Now() time.Time {
+	return this.now
+}
+
+// Change the time and wait to rotators actions scheduled for this time or earlier.
+// Paramaters:
+//      newTime - string in the format "2006-01-02T15:04:05"
+// Returns:
+//      New mocked time
+func (this *mockTimeSource) SetTime(newTime string) time.Time {
+	now, _ := time.Parse("2006-01-02T15:04:05", newTime)
+	if this.now != now {
+		this.now = now
+		AfterChangeMockedTime(true)
+	}
+	return this.now
+}
+
+// Shift the time and wait to rotators actions scheduled for this time or earlier.
+// Paramaters:
+//      duration
+// Returns:
+//      New mocked time
+func (this *mockTimeSource) ShiftTime(duration time.Duration) time.Time {
+	if duration > 0 {
+		this.now = this.now.Add(duration)
+		AfterChangeMockedTime(true)
+	}
 	return this.now
 }
 

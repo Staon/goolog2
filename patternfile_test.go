@@ -2,11 +2,12 @@ package goolog2_test
 
 import (
 	"bytes"
-	. "goolog2"
 	"io/ioutil"
 	"os"
 	"testing"
 	"time"
+
+	. "github.com/Staon/goolog2"
 )
 
 func TestPatternFile(t *testing.T) {
@@ -28,14 +29,12 @@ func TestPatternFile(t *testing.T) {
 	Error1("First error")
 
 	/* -- move time after the checking interval */
-	now, _ = time.Parse("2006-01-02T15:04:05", "2018-08-25T14:02:30")
-	timesrc.now = now
+	timesrc.SetTime("2018-08-25T14:02:30")
 	Info1("Second message")
 	Error1("Second error")
 
 	/* -- move time to force rotation of the logs */
-	now, _ = time.Parse("2006-01-02T15:04:05", "2018-08-25T14:03:00")
-	timesrc.now = now
+	timesrc.SetTime("2018-08-25T14:03:00")
 	Info1("Third message")
 	Error1("Third error")
 
